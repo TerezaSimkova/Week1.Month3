@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Week1secondpart.Core\Week1secondpart.Core.csproj" />
+    <ProjectReference Include="..\Week1secondpart.Mock\Week1secondpart.Mock.csproj" />
+  </ItemGroup>
+
+</Project>

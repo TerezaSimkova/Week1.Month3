@@ -68,10 +68,20 @@ namespace Week1secondpart.Mock
           
         }
 
+        public List<Pizza> GetByIngrediente(string ingrediente)
+        {
+            throw new NotImplementedException();
+        }
+
         public Pizza GetByName(string nome)
         {
             return pizze.Find(p => p.Nome == nome);
             
+        }
+
+        public string GetConto()
+        {
+            throw new NotImplementedException();
         }
 
         public Pizza Update(Pizza item)

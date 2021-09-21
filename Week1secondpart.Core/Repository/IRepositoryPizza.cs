@@ -10,5 +10,7 @@ namespace Week1secondpart.Core.Repository
     {
         public Pizza GetByName(string nome);
         void AddToConto(Pizza existPizza);
+        public string GetConto();
+        public List<Pizza> GetByIngrediente(string ingrediente);
     }
 }

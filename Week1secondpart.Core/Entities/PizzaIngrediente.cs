@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Week1secondpart.Core.Entities
 {
-    public class Ingrediente
+    public class PizzaIngrediente
     {
+        public Pizza Pizza { get; set; }
+        public int IdPizza { get; set; }
+        public Ingrediente Ingrediente { get; set; }
         public int IdIngr { get; set; }
-        public string NomeIngr { get; set; }
-
-        public Ingrediente() { }
     }
+
 }

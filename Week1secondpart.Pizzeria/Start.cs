@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using Week1secondpart.Core;
 using Week1secondpart.Core.BusinessLayer;
 using Week1secondpart.Mock;
 
@@ -12,21 +14,28 @@ namespace Week1secondpart.Pizzeria
         public static void Menu()
         {
 
-            Console.WriteLine("***Benvenuto in pizzeria!***");
+            Console.WriteLine("***Benvenuto in pizzeria!***\n");
             int scelta;
             bool continua = true;
             do
             {
                 do
                 {
-                    Console.WriteLine("Scegli 1. per vedere il menu delle pizze.");
+
+                    Console.WriteLine("\nScegli Q per uscire.");
+                    Console.WriteLine("\nScegli 1. per vedere il menu delle pizze.");
                     Console.WriteLine("Scegli 2. per acquistare delle pizze.");
                     Console.WriteLine("Scegli 3. per pagare.");
+                    Console.WriteLine("Scegli 4. per filtrare le pizze per ingredienti.\n");
 
-                } while (!int.TryParse(Console.ReadLine(), out scelta) || scelta < 0 || scelta > 3);
+                } while (!int.TryParse(Console.ReadLine(), out scelta) || scelta < 0 || scelta > 4);
 
                 switch (scelta)
                 {
+                    case 'Q':
+                        continua = false;
+                        Console.WriteLine("Arrivederci");
+                        break;
                     case 1:
                         ShowPizzeMenu();
                         break;
@@ -36,6 +45,9 @@ namespace Week1secondpart.Pizzeria
                     case 3:
                         Paga();
                         break;
+                    case 4:
+                        FiltraPizze();
+                        break;
                 }
 
 
@@ -43,16 +55,35 @@ namespace Week1secondpart.Pizzeria
 
 
         }
+
+        private static void FiltraPizze()
+        {
+            string ingrediente = string.Empty;
+            do
+            {
+                Console.WriteLine("Scegli ingrediente che ti interessa:\n- pomodoro \n- basilico \n- verdure_grigliate \n- mozzarella \n- friarelli");
+                ingrediente = Console.ReadLine();
+
+            } while (string.IsNullOrEmpty(ingrediente));
+
+            var esito = bl.FiltraPerIngrediente(ingrediente);
+            foreach (var item in esito)
+            {
+                Console.WriteLine(item.ToString());
+            }
+
+        }
+
         //molti a molti
         private static void Paga()
         {
-            Console.WriteLine("\nDevi pagare:");
-
+            string conto = bl.GetContoPizze();
+            Console.WriteLine("***Scontrino***\n");
+            Console.WriteLine(conto);
         }
 
         private static void CompraPizza()
         {
-            bool continua = true;
             string nome = string.Empty;
 
             do
@@ -64,8 +95,6 @@ namespace Week1secondpart.Pizzeria
 
             var esito = bl.GetByName(nome);
             Console.WriteLine(esito);
-
-
         }
 
         private static void ShowPizzeMenu()

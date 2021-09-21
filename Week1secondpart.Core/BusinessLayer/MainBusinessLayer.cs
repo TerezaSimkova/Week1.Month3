@@ -20,10 +20,6 @@ namespace Week1secondpart.Core.BusinessLayer
         {
             return pizzaRepo.GetAll();
         }
-        public string GetSpesa()
-        {
-            throw new NotImplementedException();
-        }
 
         public string GetByName(string nome)
         {
@@ -44,6 +40,25 @@ namespace Week1secondpart.Core.BusinessLayer
                 return "La pizza non esiste!";
             }
             
+        }
+
+        public string GetContoPizze()
+        {
+            var contoPizze = pizzaRepo.GetConto();
+            if (contoPizze == null)
+            {
+                return "Non ce nessun conto da pagare!";
+            }
+            else
+            {
+                return contoPizze;
+            }
+        }
+
+        public List<Pizza> FiltraPerIngrediente(string ingrediente)
+        {
+            return pizzaRepo.GetByIngrediente(ingrediente);
+
         }
     }
 }

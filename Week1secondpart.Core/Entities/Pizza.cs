@@ -9,6 +9,8 @@ namespace Week1secondpart.Core
         public string Nome { get; set; }
         public List<string> Ingredienti { get; set; } = new List<string>();
         public int Prezzo { get; set; }
+
+
         public Pizza() { }
 
         public override string ToString()

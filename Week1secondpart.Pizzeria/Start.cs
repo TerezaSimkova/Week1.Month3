@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Week1secondpart.Core;
+using Week1secondpart.Core.AdoRepository;
 using Week1secondpart.Core.BusinessLayer;
+using Week1secondpart.Core.Entities;
 using Week1secondpart.Mock;
 
 namespace Week1secondpart.Pizzeria
@@ -10,25 +13,27 @@ namespace Week1secondpart.Pizzeria
     public class Start
     {
         //private static readonly IBusinessLayer bl = new MainBusinessLayer(new RepositoryPizzaTxt());
-        private static readonly IBusinessLayer bl = new MainBusinessLayer(new RepositoryPizzaMock());
+        private static readonly IBusinessLayer bl = new MainBusinessLayer(new RepositoryPizzaMock(), new RepositoryIngredientiMock(), new RepositoryPizzeIngredientiMock());
+        //private static readonly IBusinessLayer bl = new MainBusinessLayer(new PizzaAdoRepository());
+
+        private static List<Pizza> pizzeScelte = new List<Pizza>();
         public static void Menu()
         {
 
             Console.WriteLine("***Benvenuto in pizzeria!***\n");
             int scelta;
             bool continua = true;
+            File.Delete(@"C:\Users\tereza.simkova\source\repos\Week1secondpart\Conto.txt");
             do
             {
                 do
                 {
 
                     Console.WriteLine("\nScegli Q per uscire.");
-                    Console.WriteLine("\nScegli 1. per vedere il menu delle pizze.");
-                    Console.WriteLine("Scegli 2. per acquistare delle pizze.");
-                    Console.WriteLine("Scegli 3. per pagare.");
-                    Console.WriteLine("Scegli 4. per filtrare le pizze per ingredienti.\n");
+                    Console.WriteLine("Scegli 1. per vedere il menu delle pizze.");
+                    Console.WriteLine("Scegli 2. per filtrare le pizze per ingredienti.");
 
-                } while (!int.TryParse(Console.ReadLine(), out scelta) || scelta < 0 || scelta > 4);
+                } while (!int.TryParse(Console.ReadLine(), out scelta) || scelta < 0 || scelta > 3);
 
                 switch (scelta)
                 {
@@ -37,15 +42,17 @@ namespace Week1secondpart.Pizzeria
                         Console.WriteLine("Arrivederci");
                         break;
                     case 1:
-                        ShowPizzeMenu();
+                        List<Pizza> allPizze = ShowPizzeMenu();
+                        if (allPizze != null)
+                        {
+                            CompraPizza(allPizze);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Non ci sono le pizze da poter acquistare!");
+                        }
                         break;
                     case 2:
-                        CompraPizza();
-                        break;
-                    case 3:
-                        Paga();
-                        break;
-                    case 4:
                         FiltraPizze();
                         break;
                 }
@@ -58,52 +65,101 @@ namespace Week1secondpart.Pizzeria
 
         private static void FiltraPizze()
         {
+            List<Ingrediente> ingredientiPizze = bl.SeeAllIngredienti();
+            foreach (var ingr in ingredientiPizze)
+            {
+                Console.WriteLine(ingr);
+            }
+
             string ingrediente = string.Empty;
             do
             {
-                Console.WriteLine("Scegli ingrediente che ti interessa:\n- pomodoro \n- basilico \n- verdure_grigliate \n- mozzarella \n- friarelli");
+                Console.WriteLine("Scegli ingrediente che ti interessa:");
                 ingrediente = Console.ReadLine();
 
             } while (string.IsNullOrEmpty(ingrediente));
 
-            var esito = bl.FiltraPerIngrediente(ingrediente);
-            foreach (var item in esito)
+            //var ingredienteScelto = bl.GetPizzeByIngrediente(ingrediente);
+            var ingredienteScelto = ingredientiPizze.Where(i => i.Nome == ingrediente).SingleOrDefault();
+
+            if (ingredienteScelto == null)
+            {
+                Console.WriteLine("Non esiste questo ingrediente nella lista degli ingredienti.");
+            }
+            else
+            {
+                var pizzePossibili = bl.GetPizzeByIngrediente(ingrediente);
+                if (pizzePossibili.Count == 0)
+                {
+                    Console.WriteLine($"Non ci sono pizze con ingrediente {ingredienteScelto}");
+                }
+                else
+                {
+                    Console.WriteLine($"Le pizze con ingrediente {ingredienteScelto} sono : ");
+                    Stampa(pizzePossibili);
+                }
+
+            }
+        }
+
+        private static void Stampa(List<Pizza> pizzePossibili)
+        {
+            foreach (var item in pizzePossibili)
             {
                 Console.WriteLine(item.ToString());
             }
-
         }
 
         //molti a molti
-        private static void Paga()
+        //private static void Paga()
+        //{
+        //    string conto = bl.GetContoPizze();
+        //    Console.WriteLine("***Scontrino***\n");
+        //    Console.WriteLine(conto);
+        //}
+
+        private static void CompraPizza(List<Pizza> allPizza)
         {
-            string conto = bl.GetContoPizze();
-            Console.WriteLine("***Scontrino***\n");
-            Console.WriteLine(conto);
-        }
-
-        private static void CompraPizza()
-        {
-            string nome = string.Empty;
-
-            do
-            {
-                Console.WriteLine("\nScrivi nome della pizza che vuoi aggiungere al carello:");
-                nome = Console.ReadLine();
-
-            } while (string.IsNullOrEmpty(nome));
-
-            var esito = bl.GetByName(nome);
-            Console.WriteLine(esito);
-        }
-
-        private static void ShowPizzeMenu()
-        {
-            var menu = bl.SeeAllPizza();
-            foreach (var p in menu)
+            foreach (var p in allPizza)
             {
                 Console.WriteLine(p.ToString());
             }
+
+            string nome = string.Empty;
+            bool continua = true;
+            do
+            {
+                do
+                {
+                    Console.WriteLine("\nScrivi nome della pizza che vuoi aggiungere al carello:");
+                    nome = Console.ReadLine();
+
+                } while (string.IsNullOrEmpty(nome));
+
+                var pizza = bl.GetByName(nome);
+                //var pizza = allPizza.Where(p => p.Nome == nome).SingleOrDefault();
+                if (pizza == null)
+                {
+                    Console.WriteLine("\nPizza non esiste nel database.");
+                }
+                else
+                {
+                    pizzeScelte.Add(pizza);
+                }
+                Console.WriteLine("Vuoi aggiungere un'altra pizza?\n Premi S per si");
+                var scelta = Console.ReadKey();
+                continua = ConsoleKey.S.Equals(scelta.Key);
+                Console.WriteLine();
+
+            } while (continua);
+            bl.StampaScontrino(pizzeScelte);
+        }
+
+        private static List<Pizza> ShowPizzeMenu()
+        {
+            var menu = bl.SeeAllPizza();
+
+            return menu;
         }
 
         private static void prova1()

@@ -4,42 +4,41 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Week1secondpart.Core.Entities;
 using Week1secondpart.Core.Repository;
 
 namespace Week1secondpart.Core.BusinessLayer
 {
     public class MainBusinessLayer : IBusinessLayer
     {
+
         private readonly IRepositoryPizza pizzaRepo;
-        public MainBusinessLayer(IRepositoryPizza repositoryPizza)
+        private readonly IRepositoryIngredienti ingRepo;
+        private readonly IPizzaIngrediente ingEpizzaRepo;
+        public MainBusinessLayer(IRepositoryPizza repositoryPizza, IRepositoryIngredienti repositoryIngredienti, IPizzaIngrediente pizzaIngrediente)
         {
             pizzaRepo = repositoryPizza;
+            ingRepo = repositoryIngredienti;
+            ingEpizzaRepo = pizzaIngrediente;
         }
 
         public List<Pizza> SeeAllPizza()
         {
-            return pizzaRepo.GetAll();
+            var ingredienti = ingRepo.GetAll();
+            var pizzeIngredienti = ingEpizzaRepo.GetAll();
+            return pizzaRepo.GetAll(ingredienti,pizzeIngredienti);
         }
 
-        public string GetByName(string nome)
+        public Pizza GetByName(string nome)
         {
-            if (nome == null)
-            {
-                return "La pizza non esiste!";
-            }
-
-            var existPizza = pizzaRepo.GetByName(nome);
-          
+            Pizza existPizza = pizzaRepo.GetByName(nome);
+            
             if (nome == "Marinara" || nome == "Margherita" || nome == "Vegetariana")
             {
                 pizzaRepo.AddToConto(existPizza);
-                return "Pizza aggiunta con successo!";
+                Console.WriteLine("Pizza aggiunta al carello con successo!");
             }
-            else
-            {
-                return "La pizza non esiste!";
-            }
-            
+            return existPizza;
         }
 
         public string GetContoPizze()
@@ -55,10 +54,22 @@ namespace Week1secondpart.Core.BusinessLayer
             }
         }
 
-        public List<Pizza> FiltraPerIngrediente(string ingrediente)
+        public List<Pizza> GetPizzeByIngrediente(string ingredienteScelto)
         {
-            return pizzaRepo.GetByIngrediente(ingrediente);
-
+            var ingredienti = ingRepo.GetAll();
+            var pizzeIngredienti = pizzaRepo.GetAll();
+            return pizzaRepo.GetPizzeByIngrediente(ingredienteScelto, ingredienti, pizzeIngredienti);
         }
+
+        public List<Ingrediente> SeeAllIngredienti()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void StampaScontrino(List<Pizza> pizzeScelte)
+        {
+            int totale = pizzaRepo.CalcolaConto(pizzeScelte);
+        }
+
     }
 }

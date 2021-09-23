@@ -8,10 +8,16 @@ namespace Week1secondpart.Core.Entities
 {
     public class PizzaIngrediente
     {
-        public Pizza Pizza { get; set; }
         public int IdPizza { get; set; }
-        public Ingrediente Ingrediente { get; set; }
         public int IdIngr { get; set; }
+
+        public PizzaIngrediente(int idPizza, int idIngrediente)
+        {
+            IdPizza = idPizza;
+            IdIngr = idIngrediente;
+        }
+
+        public PizzaIngrediente() { }
     }
 
 }

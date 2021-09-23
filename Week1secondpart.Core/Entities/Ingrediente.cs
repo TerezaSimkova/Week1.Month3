@@ -8,9 +8,20 @@ namespace Week1secondpart.Core.Entities
 {
     public class Ingrediente
     {
-        public int IdIngr { get; set; }
-        public string NomeIngr { get; set; }
+        public int Id { get; set; }
+        public string Nome { get; set; }
+
+        public Ingrediente(int id, string nome)
+        {
+            Id = id;
+            Nome = nome;
+        }
 
         public Ingrediente() { }
+
+        public string Print()
+        {
+            return $"{Nome}";
+        }
     }
 }
